@@ -2,35 +2,47 @@
 Library    SeleniumLibrary
 
 *** Variables ***
-${URL}           https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
-${BROWSER}       Chrome
-${VALID_USER}    Admin
-${VALID_PASS}    admin123
-${INVALID_USER}  wronguser
-${INVALID_PASS}  wrongpass
+${URL}            https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+${BROWSER}        chrome
+${USERNAME}       Admin
+${PASSWORD}       admin123
+${INVALID_USERNAME}    Admin1
+${INVALID_PASSWORD}    admin1231
+${NAME_USERNAME}  username
+${NAME_PASSWORD}  password
 
 *** Test Cases ***
+Login Thành Công Với Admin 1
+    Mở Trình Duyệt
+    Đăng Nhập    ${USERNAME}    ${PASSWORD}
+    Kiểm Tra Đăng Nhập Thành Công
+    Đóng Trình Duyệt
 
-TC_Login_01_Valid_Login
-    [Documentation]    Đăng nhập với thông tin hợp lệ - hiển thị Dashboard
+Login Thất Bại Với Admin 2
+    Mở Trình Duyệt
+    Đăng Nhập    ${INVALID_USERNAME}    ${INVALID_PASSWORD}
+    Kiểm Tra Đăng Nhập Thất Bại
+    Đóng Trình Duyệt
+
+*** Keywords ***
+Mở Trình Duyệt
     Open Browser    ${URL}    ${BROWSER}
     Maximize Browser Window
-    Wait Until Element Is Visible    name=username
-    Input Text    name=username    ${VALID_USER}
-    Input Text    name=password    ${VALID_PASS}
-    Click Button    xpath=//button[@type='submit']
-    Wait Until Element Is Visible    xpath=//h6[text()='Dashboard']    timeout=10s
-    Page Should Contain Element    xpath=//h6[text()='Dashboard']
-    
-*** Test Cases ***
-TC_Login_02_Invalid_Login
-    [Documentation]    Đăng nhập với thông tin sai - hiển thị thông báo lỗi
-    Open Browser    ${URL}    ${BROWSER}
-    Maximize Browser Window
-    Wait Until Element Is Visible    name=username
-    Input Text    name=username    ${INVALID_USER}
-    Input Text    name=password    ${INVALID_PASS}
-    Click Button    xpath=//button[@type='submit']
-    Wait Until Element Is Visible    xpath=//div[contains(., 'Invalid credentials')]    timeout=15s
-    Page Should Contain    Invalid credentials
+    Sleep    6s
 
+Đăng Nhập
+    [Arguments]    ${USERNAME}    ${PASSWORD}
+    Input Text    xpath=//input[@name="username"]    ${USERNAME}
+    Input Text    xpath=//input[@name="password"]    ${PASSWORD}
+    Click Button    xpath=//button[@type="submit"]
+    Sleep    6s
+
+Kiểm Tra Đăng Nhập Thành Công
+    Page Should Contain    Dashboard
+
+Kiểm Tra Đăng Nhập Thất Bại
+    Page Should Contain Element    css=p.oxd-alert-content-text
+    Element Should Contain    css=p.oxd-alert-content-text    Invalid credentials
+
+Đóng Trình Duyệt
+    Close Browser
